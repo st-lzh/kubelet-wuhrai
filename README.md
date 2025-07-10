@@ -129,14 +129,6 @@ kubelet-wuhrai "将nginx应用扩展到5个副本"
 kubelet-wuhrai "更新nginx镜像到最新版本"
 ```
 
-### 🌐 Web界面
-```bash
-# 启动Web界面
-kubelet-wuhrai --user-interface html --ui-listen-address 0.0.0.0:8888
-
-# 访问 http://localhost:8888 使用图形界面
-```
-
 ## 📖 文档
 
 ### 📚 核心文档
