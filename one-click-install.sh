@@ -119,8 +119,8 @@ check_go() {
 # 安装Go环境
 install_go() {
     local go_version="1.24.3"
-    local go_url="https://golang.org/dl/go${go_version}.${OS}-${ARCH}.tar.gz"
-    local go_file="go${go_version}.${OS}-${ARCH}.tar.gz"
+    local go_url="https://golang.org/dl/go${go_version}.linux-${ARCH}.tar.gz"
+    local go_file="go${go_version}.linux-${ARCH}.tar.gz"
 
     # macOS特殊处理
     if [[ "$OS" == "macos" ]]; then
