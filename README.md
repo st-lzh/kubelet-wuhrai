@@ -164,14 +164,6 @@ kubelet-wuhrai --user-interface html --ui-listen-address 0.0.0.0:8888
 go build -o kubelet-wuhrai ./cmd/
 ```
 
-### 🐳 Docker部署
-```bash
-# 构建Docker镜像
-docker build -t kubelet-wuhrai .
-
-# 运行容器
-docker run -p 8888:8888 kubelet-wuhrai --user-interface html
-```
 
 ### ☁️ 远程部署
 ```bash
