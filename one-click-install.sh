@@ -595,22 +595,123 @@ show_help() {
     echo "kubelet-wuhrai 一键安装脚本"
     echo ""
     echo "用法:"
-    echo "  $0                安装kubelet-wuhrai"
+    echo "  $0                安装kubelet-wuhrai (完整安装)"
+    echo "  $0 --quick        快速安装 (需要已有Go环境)"
     echo "  $0 --uninstall    卸载kubelet-wuhrai"
     echo "  $0 --help         显示此帮助信息"
     echo ""
     echo "功能:"
-    echo "  - 自动检测并安装Go环境"
+    echo "  - 自动检测并安装Go环境 (完整模式)"
     echo "  - 编译kubelet-wuhrai项目"
     echo "  - 安装到系统PATH"
     echo "  - 创建配置文件"
+    echo "  - 验证安装结果"
     echo ""
+    echo "模式说明:"
+    echo "  完整模式: 自动检测并安装Go环境，适合首次安装"
+    echo "  快速模式: 跳过Go安装，适合已有Go环境的快速部署"
+    echo ""
+}
+
+# 快速安装模式 (融合quick-install.sh的功能)
+quick_install() {
+    log_step "快速安装模式..."
+
+    # 检查Go环境 (必须存在)
+    if ! command -v go &> /dev/null; then
+        log_error "快速模式需要已安装的Go环境"
+        log_info "请使用完整模式: $0 (不带--quick参数)"
+        exit 1
+    fi
+
+    GO_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+    log_info "检测到Go版本: $GO_VERSION"
+
+    # 简单版本检查
+    if [[ "$GO_VERSION" < "1.24" ]]; then
+        log_warning "Go版本可能过低，建议升级到1.24+"
+        if ! ask_user "继续安装？" "n"; then
+            log_error "安装已取消"
+            exit 1
+        fi
+    fi
+
+    # 检查项目文件
+    local repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    cd "$repo_root"
+
+    if [[ ! -f "go.mod" ]] || [[ ! -d "cmd" ]]; then
+        log_error "请在kubelet-wuhrai项目根目录运行此脚本"
+        exit 1
+    fi
+
+    # 快速编译
+    log_info "下载依赖..."
+    go mod download || { log_error "依赖下载失败"; exit 1; }
+
+    log_info "编译程序..."
+    mkdir -p bin
+
+    # 获取版本信息
+    local version="dev"
+    local commit="none"
+    local date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    if command -v git &> /dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
+        commit=$(git rev-parse --short HEAD 2>/dev/null || echo "none")
+    fi
+
+    go build -ldflags "-X main.version=${version} -X main.commit=${commit} -X main.date=${date}" -o bin/kubelet-wuhrai ./cmd || { log_error "编译失败"; exit 1; }
+
+    # 检查编译结果
+    if [[ ! -f "bin/kubelet-wuhrai" ]]; then
+        log_error "编译失败，未找到二进制文件"
+        exit 1
+    fi
+
+    local file_size=$(du -h bin/kubelet-wuhrai | cut -f1)
+    log_success "编译完成: ${file_size}"
+
+    # 安装到系统
+    install_to_system
+
+    # 验证安装
+    verify_installation
 }
 
 # 主函数
 main() {
     # 处理命令行参数
     case "${1:-}" in
+        --quick)
+            # 快速安装模式
+            echo -e "${BOLD}${CYAN}"
+            echo "=================================================="
+            echo "    kubelet-wuhrai 快速安装模式"
+            echo "=================================================="
+            echo -e "${NC}"
+
+            detect_os
+            quick_install
+
+            echo -e "${BOLD}${GREEN}"
+            echo "=================================================="
+            echo "           🎉 快速安装完成！"
+            echo "=================================================="
+            echo -e "${NC}"
+
+            log_info "🚀 使用方法:"
+            log_info "  查看帮助: kubelet-wuhrai --help"
+            log_info "  查看版本: kubelet-wuhrai version"
+            log_info "  交互模式: kubelet-wuhrai"
+            log_info ""
+            log_info "🔑 API密钥配置示例:"
+            log_info "  export DEEPSEEK_API_KEY=\"your-key\""
+            log_info "  export OPENAI_API_KEY=\"your-key\""
+            log_info "  export OPENAI_API_BASE=\"https://your-api.com/v1\""
+
+            exit 0
+            ;;
         --uninstall)
             uninstall
             exit 0
@@ -620,7 +721,7 @@ main() {
             exit 0
             ;;
         "")
-            # 继续正常安装流程
+            # 继续正常安装流程 (完整模式)
             ;;
         *)
             log_error "未知参数: $1"
@@ -631,7 +732,7 @@ main() {
 
     echo -e "${BOLD}${CYAN}"
     echo "=================================================="
-    echo "    kubelet-wuhrai 一键安装脚本"
+    echo "    kubelet-wuhrai 完整安装模式"
     echo "=================================================="
     echo -e "${NC}"
 

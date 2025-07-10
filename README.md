@@ -59,18 +59,14 @@ kubelet-wuhrai 是一个革命性的Kubernetes管理工具，让您能够使用�
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/kubelet-wuhrai.git
+git clone https://github.com/st-lzh/kubelet-wuhrai.git
 cd kubelet-wuhrai
 
-# 一键安装（推荐）
+# 完整安装（推荐，自动安装Go环境）
 ./one-click-install.sh
-```
 
-### ⚡ 快速安装（已有Go环境）
-
-```bash
-# 快速编译安装
-./quick-install.sh
+# 快速安装（已有Go环境）
+./one-click-install.sh --quick
 ```
 
 ### 🔑 配置API密钥
