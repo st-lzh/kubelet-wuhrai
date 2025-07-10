@@ -1,0 +1,57 @@
+kubelet-wuhrai Custom License
+
+Copyright (c) 2024 kubelet-wuhrai Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use,
+copy, modify, merge, publish, and distribute the Software for non-commercial
+purposes, subject to the following conditions:
+
+PERMITTED USES:
+1. Personal use
+2. Educational and research purposes
+3. Open source projects
+4. Non-commercial development and testing
+
+COMMERCIAL USE RESTRICTION:
+Commercial use of this software requires explicit written permission from the
+copyright holders. Commercial use includes, but is not limited to:
+- Using the software in a commercial product or service
+- Providing commercial services using this software
+- Distributing the software as part of a commercial offering
+- Using the software in any revenue-generating activity
+
+For commercial licensing inquiries, please contact:
+Email: lzh094285@gmail.com
+GitHub: https://github.com/st-lzh/kubelet-wuhrai
+
+CONDITIONS:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+ATTRIBUTION:
+This software is based on kubectl-ai by Google Cloud Platform:
+https://github.com/GoogleCloudPlatform/kubectl-ai
+
+Any distribution of this software must include attribution to both the original
+kubectl-ai project and this kubelet-wuhrai project.
+
+DISCLAIMER:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+TERMINATION:
+This license is automatically terminated if you violate any of its terms.
+Upon termination, you must cease all use and distribution of the Software.
+
+GOVERNING LAW:
+This license shall be governed by and construed in accordance with the laws
+of the People's Republic of China, without regard to its conflict of law provisions.
+
+For the latest version of this license and commercial licensing options,
+please visit: https://github.com/st-lzh/kubelet-wuhrai

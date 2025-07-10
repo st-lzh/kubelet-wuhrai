@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SRC_DIR=${REPO_ROOT}/modelserving
+cd "${SRC_DIR}"
+
+
+export ARCHITECTURES=cpu # TODO: we could support cuda locally, but it is slow to build..
+
+# Build and export the docker image; so we are consistent in how we build
+[[ -x dev/tasks/build-images ]] || {
+  echo "ERROR: build-images script not found or not executable"
+  exit 1
+}
+
+mkdir -p .build/llamacpp-server-cpu
+BUILDX_ARGS="--output type=local,dest=.build/llamacpp-server-cpu" dev/tasks/build-images
+
+# Default model
+export LLAMA_ARG_MODEL=${SRC_DIR}/.cache/gemma-3-12b-it-Q4_K_M.gguf
+
+# Bigger context size (though not too large given memory)
+export LLAMA_ARG_CTX_SIZE=16384
+
+LD_LIBRARY_PATH=.build/llamacpp-server-cpu/lib/ .build/llamacpp-server-cpu/llama-server --jinja -fa

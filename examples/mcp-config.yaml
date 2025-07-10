@@ -1,0 +1,250 @@
+# kubelet-wuhrai MCP配置示例
+# 将此文件复制到 ~/.config/kubelet-wuhrai/mcp.yaml
+
+# =============================================================================
+# MCP服务器配置
+# =============================================================================
+
+servers:
+  # -----------------------------------------------------------------------------
+  # 本地stdio MCP服务器
+  # -----------------------------------------------------------------------------
+  
+  - name: "sequential-thinking"
+    description: "提供顺序思维和推理能力的MCP服务器"
+    command: "npx"
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-sequential-thinking"
+    env:
+      NODE_ENV: "production"
+      DEBUG: "mcp:*"
+    timeout: "30s"
+    retry_count: 3
+    
+  - name: "filesystem-tools"
+    description: "文件系统操作工具"
+    command: "npx"
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-filesystem"
+      - "/tmp"
+      - "/var/log"
+    env:
+      NODE_ENV: "production"
+    timeout: "20s"
+    
+  # -----------------------------------------------------------------------------
+  # HTTP MCP服务器
+  # -----------------------------------------------------------------------------
+  
+  - name: "github-tools"
+    description: "GitHub API集成工具"
+    url: "https://api.github.com/mcp"
+    auth:
+      type: "bearer"
+      token: "${GITHUB_TOKEN}"
+    headers:
+      User-Agent: "kubelet-wuhrai/1.0"
+      Accept: "application/vnd.github.v3+json"
+    timeout: "60s"
+    retry_count: 2
+    
+  - name: "slack-integration"
+    description: "Slack集成工具"
+    url: "https://slack.com/api/mcp"
+    auth:
+      type: "bearer"
+      token: "${SLACK_BOT_TOKEN}"
+    headers:
+      Content-Type: "application/json"
+    timeout: "45s"
+    
+  - name: "jira-tools"
+    description: "Jira项目管理工具"
+    url: "https://your-domain.atlassian.net/rest/api/3/mcp"
+    auth:
+      type: "basic"
+      username: "${JIRA_USERNAME}"
+      password: "${JIRA_API_TOKEN}"
+    headers:
+      Accept: "application/json"
+    timeout: "60s"
+    
+  # -----------------------------------------------------------------------------
+  # 内部企业MCP服务器
+  # -----------------------------------------------------------------------------
+  
+  - name: "monitoring-tools"
+    description: "内部监控工具集成"
+    url: "http://monitoring.internal.com:8080/mcp"
+    auth:
+      type: "basic"
+      username: "${MCP_USERNAME}"
+      password: "${MCP_PASSWORD}"
+    headers:
+      X-Internal-Service: "kubelet-wuhrai"
+    timeout: "45s"
+    retry_count: 3
+    
+  - name: "ci-cd-tools"
+    description: "CI/CD流水线工具"
+    url: "https://jenkins.internal.com/mcp"
+    auth:
+      type: "bearer"
+      token: "${JENKINS_API_TOKEN}"
+    headers:
+      Jenkins-Crumb: "${JENKINS_CRUMB}"
+    timeout: "120s"
+    
+  - name: "database-tools"
+    description: "数据库管理工具"
+    url: "https://db-admin.internal.com/mcp"
+    auth:
+      type: "custom"
+      headers:
+        Authorization: "ApiKey ${DB_API_KEY}"
+        X-Database-Role: "readonly"
+    timeout: "90s"
+    
+  # -----------------------------------------------------------------------------
+  # 云服务MCP集成
+  # -----------------------------------------------------------------------------
+  
+  - name: "aws-tools"
+    description: "AWS云服务工具"
+    url: "https://aws-mcp-proxy.internal.com/mcp"
+    auth:
+      type: "custom"
+      headers:
+        X-AWS-Access-Key: "${AWS_ACCESS_KEY_ID}"
+        X-AWS-Secret-Key: "${AWS_SECRET_ACCESS_KEY}"
+        X-AWS-Region: "${AWS_DEFAULT_REGION}"
+    timeout: "60s"
+    
+  - name: "gcp-tools"
+    description: "Google Cloud Platform工具"
+    url: "https://gcp-mcp-proxy.internal.com/mcp"
+    auth:
+      type: "bearer"
+      token: "${GCP_ACCESS_TOKEN}"
+    headers:
+      X-GCP-Project: "${GCP_PROJECT_ID}"
+    timeout: "60s"
+    
+  # -----------------------------------------------------------------------------
+  # 开发工具MCP集成
+  # -----------------------------------------------------------------------------
+  
+  - name: "docker-registry"
+    description: "Docker镜像仓库工具"
+    url: "https://registry.internal.com/v2/mcp"
+    auth:
+      type: "basic"
+      username: "${DOCKER_USERNAME}"
+      password: "${DOCKER_PASSWORD}"
+    timeout: "30s"
+    
+  - name: "artifact-repository"
+    description: "制品仓库工具"
+    url: "https://nexus.internal.com/service/rest/mcp"
+    auth:
+      type: "bearer"
+      token: "${NEXUS_API_TOKEN}"
+    timeout: "45s"
+
+# =============================================================================
+# 客户端配置
+# =============================================================================
+
+client:
+  # 连接超时设置
+  connect_timeout: "10s"
+  read_timeout: "30s"
+  write_timeout: "10s"
+  
+  # 重试配置
+  max_retries: 3
+  retry_delay: "2s"
+  
+  # 缓存配置
+  cache_enabled: true
+  cache_ttl: "300s"
+  
+  # 日志配置
+  log_level: "info"
+  log_requests: false
+  log_responses: false
+
+# =============================================================================
+# 工具过滤和权限配置
+# =============================================================================
+
+tools:
+  # 允许的工具类别
+  allowed_categories:
+    - "kubernetes"
+    - "monitoring"
+    - "development"
+    - "security"
+    
+  # 禁用的工具
+  disabled_tools:
+    - "dangerous_operation"
+    - "system_shutdown"
+    
+  # 工具权限映射
+  permissions:
+    "github-tools":
+      - "read_repositories"
+      - "read_issues"
+      - "create_issues"
+    "monitoring-tools":
+      - "read_metrics"
+      - "read_alerts"
+    "ci-cd-tools":
+      - "trigger_build"
+      - "read_build_status"
+
+# =============================================================================
+# 环境变量配置示例
+# =============================================================================
+
+# 在使用前，请设置以下环境变量：
+#
+# # GitHub集成
+# export GITHUB_TOKEN="ghp_your_github_token_here"
+#
+# # Slack集成
+# export SLACK_BOT_TOKEN="xoxb-your-slack-bot-token"
+#
+# # Jira集成
+# export JIRA_USERNAME="your-email@company.com"
+# export JIRA_API_TOKEN="your-jira-api-token"
+#
+# # 内部服务认证
+# export MCP_USERNAME="your-username"
+# export MCP_PASSWORD="your-password"
+#
+# # Jenkins集成
+# export JENKINS_API_TOKEN="your-jenkins-token"
+# export JENKINS_CRUMB="your-jenkins-crumb"
+#
+# # 数据库工具
+# export DB_API_KEY="your-database-api-key"
+#
+# # AWS集成
+# export AWS_ACCESS_KEY_ID="your-aws-access-key"
+# export AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
+# export AWS_DEFAULT_REGION="us-west-2"
+#
+# # GCP集成
+# export GCP_ACCESS_TOKEN="your-gcp-access-token"
+# export GCP_PROJECT_ID="your-gcp-project-id"
+#
+# # Docker Registry
+# export DOCKER_USERNAME="your-docker-username"
+# export DOCKER_PASSWORD="your-docker-password"
+#
+# # Nexus Repository
+# export NEXUS_API_TOKEN="your-nexus-api-token"

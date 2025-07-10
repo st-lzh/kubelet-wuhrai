@@ -1,0 +1,7 @@
+script:
+- prompt: |
+    In the multi-container-test namespace, run a pod called communication-pod with two containers: a web server that serves traffic and writes logs, and a logger that processes those logs from a shared volume. The logger should only start once the web server is ready. The pod should be considered ready when the web server is serving traffic.
+setup: "setup.sh"
+verifier: "verify.sh"
+cleanup: "cleanup.sh"
+difficulty: "medium"

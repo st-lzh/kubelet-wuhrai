@@ -1,0 +1,6 @@
+script:
+- prompt: "Deploy a 5-replica StatefulSet db in namespace statefulset-test (already available) with each pod mounting a 1Gi PVC at /data containing a test file. Scale back to 2, verifying pods db-0 and db-1 retain /data/test."
+setup: "setup.sh"
+verifier: "verify.sh"
+cleanup: "cleanup.sh"
+difficulty: "hard"

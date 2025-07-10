@@ -1,0 +1,46 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: llm-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-server
+  template:
+    metadata:
+      labels:
+        app: llm-server
+    spec:
+      serviceAccountName: llm-server
+      containers:
+      - name: llm-server
+        image: llamacpp-gemma3-12b-it-cpu:latest # placeholder value, replaced by deployment scripts
+        env:
+        - name: LLAMA_ARG_FLASH_ATTN
+          value: "yes"
+        args:
+        - --jinja # Needed for tool use, no env var
+
+---
+
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: llm-server
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: llm-server
+  labels:
+    app: llm-server
+spec:
+  selector:
+    app: llm-server
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP

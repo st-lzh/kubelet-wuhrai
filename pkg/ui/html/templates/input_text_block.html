@@ -1,0 +1,9 @@
+{{ if .Editable }}
+<div>
+    <input type="text" name="q" hx-post="/send-message" placeholder="How can I help?">
+</div>
+{{ else }}
+<div>
+    <span>{{ .Text }}</span>
+</div>
+{{ end }}

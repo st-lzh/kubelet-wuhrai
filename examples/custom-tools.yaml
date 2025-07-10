@@ -1,0 +1,75 @@
+# kubelet-wuhrai 自定义工具配置示例
+# 将此文件复制到 ~/.config/kubelet-wuhrai/tools.yaml
+# 注意：使用正确的配置格式（数组格式，不是tools:对象）
+
+- name: "system_monitor"
+  description: "监控系统资源使用情况，包括CPU、内存、磁盘"
+  command: "top -bn1 | head -20 && echo '=== 内存使用 ===' && free -h && echo '=== 磁盘使用 ===' && df -h"
+  command_desc: "执行系统资源监控命令"
+  is_interactive: false
+
+- name: "network_ping"
+  description: "测试网络连接到指定目标"
+  command: "ping -c 4 8.8.8.8"
+  command_desc: "ping命令测试网络连接"
+  is_interactive: false
+
+- name: "docker_containers"
+  description: "列出所有Docker容器及其状态"
+  command: "docker ps -a"
+  command_desc: "显示所有Docker容器的状态信息"
+  is_interactive: false
+
+- name: "process_list"
+  description: "显示系统进程列表"
+  command: "ps aux | head -20"
+  command_desc: "显示当前运行的进程列表"
+  is_interactive: false
+
+- name: "disk_usage"
+  description: "检查磁盘使用情况"
+  command: "df -h"
+  command_desc: "显示文件系统磁盘使用情况"
+  is_interactive: false
+
+- name: "memory_info"
+  description: "显示内存使用信息"
+  command: "free -h"
+  command_desc: "显示系统内存使用情况"
+  is_interactive: false
+
+- name: "network_interfaces"
+  description: "显示网络接口信息"
+  command: "ip addr show"
+  command_desc: "显示网络接口配置信息"
+  is_interactive: false
+
+- name: "system_uptime"
+  description: "显示系统运行时间和负载"
+  command: "uptime"
+  command_desc: "显示系统运行时间和平均负载"
+  is_interactive: false
+
+- name: "log_check"
+  description: "检查系统日志中的错误"
+  command: "journalctl -p err --no-pager -n 10"
+  command_desc: "显示最近的系统错误日志"
+  is_interactive: false
+
+- name: "service_status"
+  description: "检查系统服务状态"
+  command: "systemctl status"
+  command_desc: "显示系统服务状态概览"
+  is_interactive: false
+
+- name: "cluster_health"
+  description: "检查Kubernetes集群健康状态"
+  command: "kubectl get nodes && echo '=== 系统Pod ===' && kubectl get pods -n kube-system"
+  command_desc: "检查Kubernetes集群和系统Pod状态"
+  is_interactive: false
+
+- name: "pod_resource_usage"
+  description: "查看Pod资源使用情况"
+  command: "kubectl top pods --all-namespaces"
+  command_desc: "显示所有命名空间中Pod的资源使用情况"
+  is_interactive: false

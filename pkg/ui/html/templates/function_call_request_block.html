@@ -1,0 +1,57 @@
+<div class="function-call-block">
+    <div class="function-call-text">
+        <span class="function-icon">⚡</span>
+        <span class="function-text">{{.Description}}</span>
+        {{ if not .Result }}
+        <span class="loading-dots">...</span>
+        {{ end }}
+    </div>
+    {{ if .Result }}
+    <div class="function-result">
+       {{.ResultHTML}}
+    </div>
+    {{ end }}
+</div>
+
+<style>
+.function-call-block {
+    margin: 8px 0;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+
+.function-call-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2c5282;
+    font-family: monospace;
+}
+
+.function-icon {
+    color: #4299e1;
+}
+
+.function-result {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+}
+
+.function-result pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.loading-dots {
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+</style>

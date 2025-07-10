@@ -1,0 +1,89 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+kubelet-wuhrai
+kubelet-wuhrai.exe
+
+# Sensitive files
+*.key
+*.pem
+*.p12
+.env
+.env.local
+.env.production
+config.local.yaml
+secrets.yaml
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Configuration files with secrets
+config/secrets/
+*.key
+*.pem
+*.crt
+
+# Build artifacts
+dist/
+build/
+bin/
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Kubernetes configs (may contain sensitive data)
+kubeconfig
+*.kubeconfig
+
+# Trace files
+*.trace
+trace.txt
+kubelet-wuhrai-trace.txt
+
+# Test files and scripts
+*-test
+check-project.sh
+test-*

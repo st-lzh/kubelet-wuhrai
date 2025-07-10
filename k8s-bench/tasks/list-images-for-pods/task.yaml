@@ -1,0 +1,9 @@
+script:
+- prompt: "What images are my pods running?"
+setup: "setup.sh"
+verifier: "verify.sh"
+cleanup: "cleanup.sh"
+# disabled: true
+difficulty: "medium"
+expect:
+- contains: "docker.io/bitnami/mysql:8.4.4-debian-12-r4"

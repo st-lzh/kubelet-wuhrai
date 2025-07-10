@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SRC_DIR=${REPO_ROOT}/modelserving
+cd "${SRC_DIR}"
+
+
+if [[ -z "${GCP_PROJECT_ID:-}" ]]; then
+  GCP_PROJECT_ID=$(gcloud config get project)
+fi
+echo "Using GCP_PROJECT_ID=${GCP_PROJECT_ID}"
+
+if [[ -z "${KUBE_CONTEXT:-}" ]]; then
+  echo "Listing GKE clusters in project ${GCP_PROJECT_ID}:"
+  gcloud container clusters list --project=${GCP_PROJECT_ID}
+  echo ""
+  echo "Please set CONTEXT to kubectl context to use"
+  exit 1
+fi
+
+# Pick a probably-unique tag
+export TAG=`date +%Y%m%d%H%M%S`
+
+# Build the image
+echo "Building images"
+export IMAGE_PREFIX=gcr.io/${GCP_PROJECT_ID}/
+ARCHITECTURES=cpu,cuda BUILDX_ARGS=--push dev/tasks/build-images
+
+# TODO: support cpu on GKE?
+MODEL_IMAGE="${IMAGE_PREFIX}llamacpp-gemma3-12b-it-cpu:${TAG}"
+RPCSERVER_IMAGE="${IMAGE_PREFIX:-}rpc-server-cuda:${TAG}"
+
+# Deploy manifests
+echo "Deploying manifests"
+cat k8s/llm-server-rpc.yaml | sed s@llamacpp-gemma3-12b-it-cpu:latest@${MODEL_IMAGE}@g | \
+  kubectl apply --context=${KUBE_CONTEXT} --server-side -f -
+
+cat k8s/rpc-server-cuda.yaml | sed s@rpc-server-cuda:latest@${RPCSERVER_IMAGE}@g | \
+  kubectl apply --context=${KUBE_CONTEXT} --server-side -f -
