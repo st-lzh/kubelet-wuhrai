@@ -421,18 +421,6 @@ func TestShellParserBehavior(t *testing.T) {
 				return
 			}
 
-			// Debug output to understand parser behavior
-			t.Logf("Command: %q", tt.command)
-			for i, call := range actualCalls {
-				t.Logf("  CallExpr %d: %v", i, call)
-				if len(call) > 0 {
-					t.Logf("    args[0] = %q", call[0])
-					if strings.Contains(call[0], "kubectl") {
-						t.Logf("    -> Contains kubectl!")
-					}
-				}
-			}
-
 			for i, expectedArgs := range tt.expected {
 				if len(actualCalls[i]) != len(expectedArgs) {
 					t.Errorf("CallExpr %d: expected %d args, got %d for command %q",

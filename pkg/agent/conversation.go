@@ -204,7 +204,7 @@ func (a *Conversation) RunOneRound(ctx context.Context, query string) error {
 				// end of streaming response
 				break
 			}
-			klog.Infof("response: %+v", response)
+
 			a.Recorder.Write(ctx, &journal.Event{
 				Timestamp: time.Now(),
 				Action:    "llm-response",
@@ -286,7 +286,6 @@ func (a *Conversation) RunOneRound(ctx context.Context, query string) error {
 
 			// Check if the command is interactive using the tool's implementation
 			isInteractive, err := toolCall.GetTool().IsInteractive(call.Arguments)
-			klog.Infof("isInteractive: %t, err: %v, CallArguments: %+v", isInteractive, err, call.Arguments)
 
 			// If interactive, handle based on whether we're using tool-use shim
 			if isInteractive {
@@ -322,7 +321,7 @@ func (a *Conversation) RunOneRound(ctx context.Context, query string) error {
 			// If our code detection returned "unknown", fall back to the LLM's assessment if available
 			if modifiesResourceStr == "unknown" {
 				if llmModifies, ok := call.Arguments["modifies_resource"].(string); ok {
-					klog.Infof("Code detection returned 'unknown', falling back to LLM assessment: %s", llmModifies)
+
 					modifiesResourceStr = llmModifies
 				}
 			}
@@ -561,7 +560,7 @@ func candidateToShimCandidate(iterator gollm.ChatResponseIterator) (gollm.ChatRe
 			for _, part := range candidate.Parts() {
 				if text, ok := part.AsText(); ok {
 					buffer += text
-					klog.Infof("text is %q", text)
+
 				} else {
 					yield(nil, fmt.Errorf("no text part found in candidate"))
 					return
@@ -579,7 +578,7 @@ func candidateToShimCandidate(iterator gollm.ChatResponseIterator) (gollm.ChatRe
 			yield(nil, fmt.Errorf("parsing ReAct response %q: %w", buffer, err))
 			return
 		}
-		buffer = "" // TODO: any trailing text?
+		buffer = ""
 		yield(&ShimResponse{candidate: parsedReActResp}, nil)
 	}, nil
 }

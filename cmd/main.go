@@ -33,6 +33,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/st-lzh/kubelet-wuhrai/gollm"
 	"github.com/st-lzh/kubelet-wuhrai/pkg/agent"
 	"github.com/st-lzh/kubelet-wuhrai/pkg/journal"
@@ -40,8 +42,6 @@ import (
 	"github.com/st-lzh/kubelet-wuhrai/pkg/tools"
 	"github.com/st-lzh/kubelet-wuhrai/pkg/ui"
 	"github.com/st-lzh/kubelet-wuhrai/pkg/ui/html"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
@@ -465,8 +465,7 @@ func RunRootCommand(ctx context.Context, opt Options, args []string) error {
 			header := ui.NewAgentTextBlock().WithText("\nMCP Server Status:")
 			mcpBlocks = append(mcpBlocks, header)
 			mcpBlocks = append(mcpBlocks, blocks...)
-			// Log MCP server status to log file
-			klog.Info("MCP server status retrieved successfully for REPL startup")
+
 		} else if err != nil {
 			klog.Warningf("Failed to retrieve MCP server status for REPL startup: %v", err)
 		}

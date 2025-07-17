@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/st-lzh/kubelet-wuhrai/gollm"
 	mcpclient "github.com/mark3labs/mcp-go/client"
 	mcp "github.com/mark3labs/mcp-go/mcp"
+	"github.com/st-lzh/kubelet-wuhrai/gollm"
 	"k8s.io/klog/v2"
 )
 
@@ -70,24 +70,6 @@ func NewClient(config ClientConfig) *Client {
 		Name: config.Name,
 		impl: impl,
 	}
-}
-
-// CreateStdioClient creates a new stdio-based MCP client (for backward compatibility).
-func CreateStdioClient(name, command string, args []string, env map[string]string) *Client {
-	// Convert env map to slice of KEY=value strings
-	var envSlice []string
-	for k, v := range env {
-		envSlice = append(envSlice, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	config := ClientConfig{
-		Name:    name,
-		Command: command,
-		Args:    args,
-		Env:     envSlice,
-	}
-
-	return NewClient(config)
 }
 
 // ===================================================================

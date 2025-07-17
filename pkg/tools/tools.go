@@ -29,8 +29,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/st-lzh/kubelet-wuhrai/pkg/journal"
 	"github.com/google/uuid"
+	"github.com/st-lzh/kubelet-wuhrai/pkg/journal"
 	"sigs.k8s.io/yaml"
 )
 
@@ -40,10 +40,6 @@ const (
 	KubeconfigKey ContextKey = "kubeconfig"
 	WorkDirKey    ContextKey = "work_dir"
 )
-
-func Lookup(name string) Tool {
-	return allTools.Lookup(name)
-}
 
 var allTools Tools = Tools{
 	tools: make(map[string]Tool),

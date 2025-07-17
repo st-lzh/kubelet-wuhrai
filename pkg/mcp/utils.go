@@ -24,7 +24,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -103,66 +102,6 @@ func calculateBackoffDelay(attempt int, config RetryConfig) time.Duration {
 	return time.Duration(delay)
 }
 
-// SanitizeServerName ensures server names are valid identifiers
-func SanitizeServerName(name string) string {
-	// Simple sanitization - replace invalid characters
-	result := ""
-	for _, char := range name {
-		if (char >= 'a' && char <= 'z') ||
-			(char >= 'A' && char <= 'Z') ||
-			(char >= '0' && char <= '9') ||
-			char == '-' || char == '_' {
-			result += string(char)
-		} else {
-			result += "_"
-		}
-	}
-
-	if result == "" {
-		result = "unnamed"
-	}
-
-	return result
-}
-
-// GroupToolsByServer groups tools by their server name for easier display
-func GroupToolsByServer(tools map[string][]Tool) map[string]int {
-	summary := make(map[string]int)
-
-	for serverName, serverTools := range tools {
-		summary[serverName] = len(serverTools)
-	}
-
-	return summary
-}
-
-// mergeEnvironmentVariables merges process environment with custom environment variables
-func mergeEnvironmentVariables(processEnv, customEnv []string) []string {
-	envMap := make(map[string]string)
-
-	// Parse process environment
-	for _, e := range processEnv {
-		if parts := strings.SplitN(e, "=", 2); len(parts) == 2 {
-			envMap[parts[0]] = parts[1]
-		}
-	}
-
-	// Override with custom environment variables
-	for _, env := range customEnv {
-		if parts := strings.SplitN(env, "=", 2); len(parts) == 2 {
-			envMap[parts[0]] = parts[1]
-		}
-	}
-
-	// Convert back to slice
-	finalEnv := make([]string, 0, len(envMap))
-	for k, v := range envMap {
-		finalEnv = append(finalEnv, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	return finalEnv
-}
-
 // expandPath expands the command path, handling ~ and environment variables
 // If the path is just a binary name (no path separators), it looks in $PATH
 func expandPath(path string) (string, error) {
@@ -233,11 +172,6 @@ func expandPath(path string) (string, error) {
 // Helper Functions to Reduce Redundancy
 // =============================================================================
 
-// withTimeout creates a context with the specified timeout and returns the context and cancel function
-func withTimeout(ctx context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(ctx, timeout)
-}
-
 // ensureConnected checks if the client is connected and returns an error if not
 func (c *Client) ensureConnected() error {
 	if c.client == nil {
@@ -265,114 +199,3 @@ type SchemaProperty interface {
 
 // SchemaBuilder is a function that builds a function definition from a tool
 type SchemaBuilder func(tool *Tool) (FunctionDefinition, error)
-
-// ConvertArgs handles all argument conversions for MCP tools.
-// It transforms keys from snake_case to camelCase and converts values to appropriate types.
-func ConvertArgs(args map[string]any) map[string]any {
-	if len(args) == 0 {
-		return args
-	}
-
-	result := make(map[string]any, len(args))
-
-	for key, value := range args {
-		// Convert key from snake_case to camelCase
-		camelKey := SnakeToCamel(key)
-
-		// Convert value based on key name patterns
-		result[camelKey] = ConvertValue(camelKey, value)
-	}
-
-	return result
-}
-
-// SnakeToCamel converts a snake_case string to camelCase.
-func SnakeToCamel(s string) string {
-	if !strings.Contains(s, "_") {
-		return s
-	}
-
-	parts := strings.Split(s, "_")
-	result := parts[0]
-
-	for _, part := range parts[1:] {
-		if len(part) > 0 {
-			result += strings.ToUpper(part[:1]) + part[1:]
-		}
-	}
-
-	return result
-}
-
-// ConvertValue infers and converts a value to an appropriate type based on the parameter name.
-func ConvertValue(paramName string, value any) any {
-	// Already primitive types that don't need conversion
-	switch value.(type) {
-	case bool, int, int32, int64, float32, float64:
-		return value
-	}
-
-	name := strings.ToLower(paramName)
-
-	// Number parameter detection
-	if IsNumberParam(name) {
-		if str, ok := value.(string); ok {
-			// Try integer conversion first
-			if num, err := strconv.Atoi(str); err == nil {
-				return num
-			}
-			// Then try float conversion
-			if num, err := strconv.ParseFloat(str, 64); err == nil {
-				return num
-			}
-		} else if f, ok := value.(float64); ok && f == float64(int(f)) {
-			// Convert whole number floats to int
-			return int(f)
-		}
-	}
-
-	// Boolean parameter detection
-	if IsBoolParam(name) {
-		if str, ok := value.(string); ok {
-			if b, err := strconv.ParseBool(str); err == nil {
-				return b
-			}
-		} else if n, ok := value.(int); ok {
-			return n != 0
-		}
-	}
-
-	return value
-}
-
-// IsNumberParam checks if a parameter name suggests a numeric value.
-func IsNumberParam(name string) bool {
-	numberPatterns := []string{"number", "count", "total", "max", "min", "limit"}
-	for _, pattern := range numberPatterns {
-		if strings.Contains(name, pattern) {
-			return true
-		}
-	}
-	return false
-}
-
-// IsBoolParam checks if a parameter name suggests a boolean value.
-func IsBoolParam(name string) bool {
-	// Prefix checks
-	boolPrefixes := []string{"is", "has", "needs", "enable"}
-	for _, prefix := range boolPrefixes {
-		if strings.HasPrefix(name, prefix) {
-			return true
-		}
-	}
-
-	// Contains checks
-	boolPatterns := []string{"required", "enabled"}
-	for _, pattern := range boolPatterns {
-		if strings.Contains(name, pattern) {
-			return true
-		}
-	}
-
-	return false
-}

@@ -19,7 +19,6 @@ package mcp
 
 import (
 	"context"
-	"fmt"
 
 	mcpclient "github.com/mark3labs/mcp-go/client"
 )
@@ -86,24 +85,4 @@ type OAuthConfig struct {
 	AuthURL      string
 	Scopes       []string
 	RedirectURL  string
-}
-
-// NewMCPClient creates a new MCP client with the appropriate implementation based on the config
-func NewMCPClient(config ClientConfig) (MCPClient, error) {
-	// Validate common configuration
-	if config.Name == "" {
-		return nil, fmt.Errorf("client name is required")
-	}
-
-	// Choose the appropriate client implementation
-	if config.URL != "" {
-		// Use HTTP client
-		return NewHTTPClient(config), nil
-	}
-
-	// Default to stdio client
-	if config.Command == "" {
-		return nil, fmt.Errorf("either URL or Command must be specified")
-	}
-	return NewStdioClient(config), nil
 }

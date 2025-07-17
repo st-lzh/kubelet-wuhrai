@@ -170,18 +170,3 @@ func extractCommandName(command string) string {
 
 	return command
 }
-
-// LoadMCPConfig loads and logs the MCP configuration
-func LoadMCPConfig() {
-	mcpConfigPath, err := mcp.DefaultConfigPath()
-	if err != nil {
-		klog.Warningf("Failed to get MCP config path: %v", err)
-		return
-	}
-
-	// Create a temporary Manager instance to call LogConfig
-	manager := &mcp.Manager{}
-	if err := manager.LogConfig(mcpConfigPath); err != nil {
-		klog.Warningf("Failed to load or log MCP config: %v", err)
-	}
-}

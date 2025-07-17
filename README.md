@@ -55,37 +55,96 @@ kubelet-wuhrai 是一个革命性的Kubernetes管理工具，让您能够使用�
 
 ## 🚀 快速开始
 
-### 📦 一键安装
+### 📦 一键安装 (推荐)
+
+**Linux/macOS 一键安装命令：**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/st-lzh/kubelet-wuhrai/main/install.sh | bash
+```
+
+这个命令会自动：
+- ✅ 检测系统架构和操作系统
+- ✅ 下载最新版本的预编译二进制文件
+- ✅ 安装到合适的目录并配置环境变量
+- ✅ 创建示例配置文件
+
+### 📦 其他安装方式
+
+<details>
+<summary>点击展开更多安装选项</summary>
+
+#### 从源码编译安装
 
 ```bash
 # 克隆项目
 git clone https://github.com/st-lzh/kubelet-wuhrai.git
 cd kubelet-wuhrai
 
-# 完整安装（推荐，自动安装Go环境）
-./one-click-install.sh
+# 编译安装
+go build -o kubelet-wuhrai ./cmd/
+sudo mv kubelet-wuhrai /usr/local/bin/
 
-# 快速安装（已有Go环境）
-./one-click-install.sh --quick
+# 或使用提供的脚本
+./quick-install.sh
 ```
+
+#### 远程服务器部署
+
+```bash
+# 部署到远程服务器
+./deploy-to-server.sh user@server
+
+# 指定安装路径
+./deploy-to-server.sh user@192.168.1.100 /opt/kubelet-wuhrai
+```
+
+</details>
 
 ### 🔑 配置API密钥
 
+安装完成后，需要配置AI模型的API密钥：
+
+```bash
+# 编辑配置文件
+vi ~/.config/kubelet-wuhrai/config.yaml
+# 或系统级安装: sudo vi /etc/kubelet-wuhrai/config.yaml
+```
+
+配置文件示例：
+```yaml
+# 选择一个AI提供商并取消注释
+deepseek_api_key: "your-deepseek-api-key"
+# openai_api_key: "your-openai-api-key"
+# qwen_api_key: "your-qwen-api-key"
+
+# 其他设置
+quiet: false
+skip_permissions: false
+enable_tool_use_shim: false
+```
+
+或使用环境变量：
 ```bash
 # DeepSeek (推荐)
 export DEEPSEEK_API_KEY="your-deepseek-api-key"
 
 # OpenAI
 export OPENAI_API_KEY="your-openai-api-key"
-
-# 自定义API
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_API_BASE="https://your-api-endpoint.com/v1"
 ```
 
 ### 🎯 开始使用
 
+首次安装后，重新加载环境变量：
 ```bash
+source ~/.bashrc  # 或 source ~/.zshrc
+```
+
+然后就可以开始使用了：
+```bash
+# 检查版本
+kubelet-wuhrai version
+
 # 基础查询
 kubelet-wuhrai "获取所有pod"
 
