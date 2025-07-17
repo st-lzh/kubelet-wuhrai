@@ -102,15 +102,16 @@ check_dependencies() {
         missing_deps+=("curl")
     fi
 
-    if ! command -v tar >/dev/null 2>&1; then
-        missing_deps+=("tar")
-    fi
+    # git是可选的，只在需要编译时检查
+    log_info "检查基础依赖..."
 
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         log_error "缺少必要的依赖: ${missing_deps[*]}"
         log_info "请先安装这些依赖，然后重新运行脚本"
         exit 1
     fi
+
+    log_success "基础依赖检查通过"
 }
 
 # 确定安装目录
@@ -180,27 +181,78 @@ download_and_install() {
     log_info "下载 $BINARY_NAME..."
     log_info "下载地址: $DOWNLOAD_URL"
 
-    # 下载文件
-    if curl -fL "$DOWNLOAD_URL" -o "$temp_file"; then
-        log_success "下载完成"
+    # 尝试下载预编译版本
+    if curl -fL "$DOWNLOAD_URL" -o "$temp_file" 2>/dev/null; then
+        log_success "下载预编译版本完成"
+        # 安装文件
+        log_info "安装到 $target_file..."
+        mv "$temp_file" "$target_file"
+        chmod +x "$target_file"
+        log_success "安装完成"
+        return 0
     else
-        log_error "下载失败"
-        log_info "请检查网络连接或手动下载安装"
-        log_info "下载地址: $DOWNLOAD_URL"
+        log_warning "预编译版本下载失败"
+        log_info "可能的原因："
+        log_info "1. GitHub releases尚未发布"
+        log_info "2. 网络连接问题"
+        log_info "3. 架构不支持: $OS-$ARCH"
+        echo ""
+
+        rm -f "$temp_file" 2>/dev/null
+
+        log_info "尝试从源码编译安装..."
+        compile_from_source "$target_file"
+    fi
+}
+
+# 从源码编译安装
+compile_from_source() {
+    local target_file="$1"
+
+    # 检查Go环境
+    if ! command -v go >/dev/null 2>&1; then
+        log_error "未找到Go环境，无法编译"
+        log_info "请安装Go 1.19+或手动下载预编译版本"
+        log_info "Go安装: https://golang.org/dl/"
         exit 1
     fi
 
-    # 安装文件
-    log_info "安装到 $target_file..."
+    local go_version=$(go version | grep -o 'go[0-9]\+\.[0-9]\+' | sed 's/go//')
+    log_info "检测到Go版本: $go_version"
 
-    if [[ "$IS_ROOT" == "true" ]]; then
-        mv "$temp_file" "$target_file"
-    else
-        mv "$temp_file" "$target_file"
+    # 创建临时目录
+    local temp_dir="/tmp/kubelet-wuhrai-build"
+    rm -rf "$temp_dir"
+    mkdir -p "$temp_dir"
+    cd "$temp_dir"
+
+    log_info "克隆源码..."
+    if ! git clone https://github.com/$REPO.git . 2>/dev/null; then
+        log_error "克隆源码失败"
+        log_info "请检查网络连接或手动安装"
+        exit 1
     fi
 
-    chmod +x "$target_file"
-    log_success "安装完成"
+    log_info "编译 $BINARY_NAME..."
+    if go build -o "$BINARY_NAME" ./cmd/; then
+        log_success "编译完成"
+
+        # 安装文件
+        log_info "安装到 $target_file..."
+        mv "$BINARY_NAME" "$target_file"
+        chmod +x "$target_file"
+
+        # 清理临时目录
+        cd /
+        rm -rf "$temp_dir"
+
+        log_success "从源码编译安装完成"
+    else
+        log_error "编译失败"
+        cd /
+        rm -rf "$temp_dir"
+        exit 1
+    fi
 }
 
 # 配置环境变量
@@ -327,6 +379,11 @@ show_completion() {
     log_bold "获取帮助："
     echo "   项目文档: https://github.com/$REPO"
     echo "   问题反馈: https://github.com/$REPO/issues"
+    echo ""
+
+    log_bold "备用安装方法："
+    echo "   如果遇到问题，可以使用简化版安装脚本："
+    echo "   curl -fsSL https://raw.githubusercontent.com/st-lzh/kubelet-wuhrai/main/install-simple.sh | bash"
     echo ""
 
     log_success "感谢使用 kubelet-wuhrai！"
