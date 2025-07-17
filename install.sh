@@ -154,13 +154,17 @@ get_latest_version() {
     fi
 
     if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
-        log_warning "无法获取最新版本，使用latest"
-        LATEST_VERSION="latest"
-        DOWNLOAD_URL="$GITHUB_RELEASES/latest/download/${BINARY_NAME}-${OS}-${ARCH}"
+        log_warning "无法获取最新版本，使用v1.0.0"
+        LATEST_VERSION="v1.0.0"
     else
         log_info "最新版本: $LATEST_VERSION"
-        DOWNLOAD_URL="$GITHUB_RELEASES/download/${LATEST_VERSION}/${BINARY_NAME}-${OS}-${ARCH}"
     fi
+
+    # 设置下载URL
+    DOWNLOAD_URL="$GITHUB_RELEASES/download/${LATEST_VERSION}/${BINARY_NAME}-${OS}-${ARCH}"
+
+    # 备用下载URL (从releases目录)
+    BACKUP_DOWNLOAD_URL="https://raw.githubusercontent.com/$REPO/main/releases/${BINARY_NAME}-${OS}-${ARCH}"
 }
 
 # 创建安装目录
@@ -182,8 +186,9 @@ download_and_install() {
     log_info "下载地址: $DOWNLOAD_URL"
 
     # 尝试下载预编译版本
+    log_info "尝试从GitHub releases下载..."
     if curl -fL "$DOWNLOAD_URL" -o "$temp_file" 2>/dev/null; then
-        log_success "下载预编译版本完成"
+        log_success "从GitHub releases下载完成"
         # 安装文件
         log_info "安装到 $target_file..."
         mv "$temp_file" "$target_file"
@@ -191,17 +196,31 @@ download_and_install() {
         log_success "安装完成"
         return 0
     else
-        log_warning "预编译版本下载失败"
-        log_info "可能的原因："
-        log_info "1. GitHub releases尚未发布"
-        log_info "2. 网络连接问题"
-        log_info "3. 架构不支持: $OS-$ARCH"
-        echo ""
-
+        log_warning "GitHub releases下载失败，尝试备用下载源..."
         rm -f "$temp_file" 2>/dev/null
 
-        log_info "尝试从源码编译安装..."
-        compile_from_source "$target_file"
+        # 尝试备用下载源
+        if curl -fL "$BACKUP_DOWNLOAD_URL" -o "$temp_file" 2>/dev/null; then
+            log_success "从备用源下载完成"
+            # 安装文件
+            log_info "安装到 $target_file..."
+            mv "$temp_file" "$target_file"
+            chmod +x "$target_file"
+            log_success "安装完成"
+            return 0
+        else
+            log_warning "所有预编译版本下载失败"
+            log_info "可能的原因："
+            log_info "1. 网络连接问题"
+            log_info "2. 架构不支持: $OS-$ARCH"
+            log_info "3. 预编译版本尚未准备"
+            echo ""
+
+            rm -f "$temp_file" 2>/dev/null
+
+            log_info "尝试从源码编译安装..."
+            compile_from_source "$target_file"
+        fi
     fi
 }
 
