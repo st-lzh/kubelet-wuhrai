@@ -60,7 +60,9 @@ kubelet-wuhrai 是一个革命性的Kubernetes管理工具，让您能够使用�
 **Linux/macOS 一键安装命令：**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/st-lzh/kubelet-wuhrai/main/install.sh | bash
+curl -fsSL -o /tmp/kubelet-wuhrai https://github.com/st-lzh/kubelet-wuhrai/releases/download/v1.0.0/kubelet-wuhrai && \
+        chmod +x /tmp/kubelet-wuhrai && \
+        sudo mv /tmp/kubelet-wuhrai /usr/local/bin/kubelet-wuhrai
 ```
 
 这个命令会自动：
