@@ -11,7 +11,7 @@
 
 *基于自然语言与Kubernetes集群交互的智能命令行工具*
 
-[🚀 快速开始](#-快速开始) • [📖 文档](#-文档) • [🛠️ 功能特性](#️-功能特性) • [🤝 贡献](#-贡献)
+[🚀 快速开始](#-快速开始) • [🛠️ 功能特性](#️-功能特性) • [📦 构建部署](#-构建部署) • [🤝 贡献](#-贡献)
 
 </div>
 
@@ -47,36 +47,11 @@ kubelet-wuhrai 是一个革命性的Kubernetes管理工具，让您能够使用�
 - 🌐 **HTTP API** - RESTful接口，支持集成
 - 📊 **Web仪表板** - 直观的图形化界面
 
-### 🚀 企业级特性
-- 📈 **高性能** - 优化的并发处理
-- 🔐 **安全可靠** - 完善的权限控制
-- 📝 **详细日志** - 完整的操作审计
-- 🔄 **容错机制** - 智能重试和错误恢复
-
 ## 🚀 快速开始
 
-### 📦 一键安装 (推荐)
+### 📦 安装
 
-**Linux/macOS 一键安装命令：**
-
-```bash
-curl -fsSL -o /tmp/kubelet-wuhrai https://github.com/st-lzh/kubelet-wuhrai/releases/download/v1.0.0/kubelet-wuhrai && \
-        chmod +x /tmp/kubelet-wuhrai && \
-        sudo mv /tmp/kubelet-wuhrai /usr/local/bin/kubelet-wuhrai
-```
-
-这个命令会自动：
-- ✅ 检测系统架构和操作系统
-- ✅ 下载最新版本的预编译二进制文件
-- ✅ 安装到合适的目录并配置环境变量
-- ✅ 创建示例配置文件
-
-### 📦 其他安装方式
-
-<details>
-<summary>点击展开更多安装选项</summary>
-
-#### 从源码编译安装
+#### 方法1: 从源码编译
 
 ```bash
 # 克隆项目
@@ -87,21 +62,23 @@ cd kubelet-wuhrai
 go build -o kubelet-wuhrai ./cmd/
 sudo mv kubelet-wuhrai /usr/local/bin/
 
-# 或使用提供的脚本
-./quick-install.sh
+# 或使用提供的安装脚本
+./install.sh
 ```
 
-#### 远程服务器部署
+#### 方法2: CentOS 7.9 专用版本
+
+对于CentOS 7.9系统，可以使用专门优化的构建脚本：
 
 ```bash
-# 部署到远程服务器
-./deploy-to-server.sh user@server
+# 构建 CentOS 7.9 版本
+./build-centos7.sh
 
-# 指定安装路径
-./deploy-to-server.sh user@192.168.1.100 /opt/kubelet-wuhrai
+# 或快速构建
+./quick-build-centos7.sh
 ```
 
-</details>
+详细部署指南请参考: [CENTOS7_DEPLOYMENT.md](CENTOS7_DEPLOYMENT.md)
 
 ### 🔑 配置API密钥
 
@@ -110,7 +87,6 @@ sudo mv kubelet-wuhrai /usr/local/bin/
 ```bash
 # 编辑配置文件
 vi ~/.config/kubelet-wuhrai/config.yaml
-# 或系统级安装: sudo vi /etc/kubelet-wuhrai/config.yaml
 ```
 
 配置文件示例：
@@ -137,12 +113,6 @@ export OPENAI_API_KEY="your-openai-api-key"
 
 ### 🎯 开始使用
 
-首次安装后，重新加载环境变量：
-```bash
-source ~/.bashrc  # 或 source ~/.zshrc
-```
-
-然后就可以开始使用了：
 ```bash
 # 检查版本
 kubelet-wuhrai version
@@ -186,39 +156,41 @@ kubelet-wuhrai "将nginx应用扩展到5个副本"
 kubelet-wuhrai "更新nginx镜像到最新版本"
 ```
 
+## 📦 构建部署
+
+### 🛠️ 本地构建
+```bash
+# 基本构建
+go build -o kubelet-wuhrai ./cmd/
+
+# 使用 Makefile 构建
+make build
+
+# CentOS 7.9 专用构建
+./build-centos7.sh
+```
+
+### 🐳 Docker 部署
+```bash
+# 构建 Docker 镜像
+docker build -t kubelet-wuhrai .
+
+# 运行容器
+docker run -d -p 8888:8888 kubelet-wuhrai
+```
+
 ## 📖 文档
 
 ### 📚 核心文档
-- [📦 安装指南](INSTALLATION_README.md) - 详细安装步骤
-- [🎯 使用指南](USAGE.md) - 基本使用方法
 - [🔧 构建指南](BUILD_GUIDE.md) - 编译和构建
+- [🎯 使用指南](USAGE.md) - 基本使用方法
+- [🔧 自定义工具](CUSTOM_TOOLS_GUIDE.md) - 自定义工具和MCP工具
+- [🐠 CentOS 7.9 部署](CENTOS7_DEPLOYMENT.md) - CentOS 7.9 专用部署指南
+- [🔧 故障排除](TROUBLESHOOTING.md) - 常见问题解决
 
-### 🛠️ 高级功能
-- [🔧 自定义工具指南](CUSTOM_TOOLS_GUIDE.md) - 自定义工具和MCP工具
-- [🌐 API调用指南](API_USAGE_EXAMPLES.md) - HTTP API使用
-- [📖 技术文档](docs/EXTENDED_TECHNICAL_GUIDE.md) - 完整技术指南
-
-### 📦 示例配置
+### 📦 配置示例
 - [🛠️ 自定义工具配置](examples/custom-tools.yaml)
 - [🔌 MCP配置示例](examples/mcp-config.yaml)
-
-## 🌐 部署选项
-
-### 🖥️ 本地安装
-```bash
-# 一键安装脚本
-./one-click-install.sh
-
-# 手动编译
-go build -o kubelet-wuhrai ./cmd/
-```
-
-
-### ☁️ 远程部署
-```bash
-# 部署到远程服务器
-./deploy-to-remote.sh user@server --install-kubectl --copy-kubeconfig
-```
 
 ## 🤝 贡献
 
@@ -237,7 +209,7 @@ go build -o kubelet-wuhrai ./cmd/
 - 报告和修复文档错误
 
 ### 🐛 问题报告
-- 使用 [Issues](https://github.com/your-username/kubelet-wuhrai/issues) 报告bug
+- 使用 [Issues](https://github.com/st-lzh/kubelet-wuhrai/issues) 报告bug
 - 提供详细的复现步骤
 - 包含系统环境信息
 
