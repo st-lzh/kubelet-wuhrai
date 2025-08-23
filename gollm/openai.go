@@ -56,7 +56,7 @@ func init() {
 	}
 
 	// Also register with any aliases defined in config
-	aliases := []string{"openai-compatible", "vllm", "openai-api", "custom-openai"}
+	aliases := []string{"openai-compatible", "openai-api", "custom-openai"}
 	for _, alias := range aliases {
 		if err := RegisterProvider(alias, newOpenAIClientFactory); err != nil {
 			klog.Warningf("Failed to register openai provider alias %q: %v", alias, err)
