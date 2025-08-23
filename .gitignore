@@ -87,3 +87,4 @@ kubelet-wuhrai-trace.txt
 *-test
 check-project.sh
 test-*
+bin/releases/
